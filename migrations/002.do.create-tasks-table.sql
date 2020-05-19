@@ -4,5 +4,5 @@ CREATE TABLE tasks (
   task_name TEXT NOT NULL,
   duration INTERVAL NOT NULL,
   description TEXT,
-  task_date DATE NOT NULL
+  task_date DATE DEFAULT now() NOT NULL
 );
