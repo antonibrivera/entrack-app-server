@@ -24,8 +24,7 @@ const TasksServices = {
     return db('tasks')
       .where('id', id)
       .update(newData)
-
-  }
+  },
 }
 
 module.exports = TasksServices;
