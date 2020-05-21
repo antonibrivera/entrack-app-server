@@ -7,7 +7,7 @@ ALTER SEQUENCE users_id_seq RESTART WITH 1;
 
 INSERT INTO users (first_name, last_name, username, password, email)
 VALUES (
-  'John', 'Doe', 'demo', 'password', 'demo@email.com'
+  'John', 'Doe', 'demouser', '$2a$06$LEEHmRC.c/zDlm.Rj2iRB.ECJdx7ZEpj1uTHdNYvV5qF.8rEIAJMq', 'demo@email.com'
 );
 
 INSERT INTO tasks (user_id, task_name, duration, description, task_date)

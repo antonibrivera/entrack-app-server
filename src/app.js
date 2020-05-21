@@ -5,6 +5,7 @@ const cors = require('cors')
 const helmet = require('helmet')
 const tasksRouter = require('./routers/tasks-router')
 const presetTasksRouter = require('./routers/preset-tasks-router')
+const authRouter = require('./auth/auth-router')
 
 const app = express()
 const { NODE_ENV } = require('./config')
@@ -20,6 +21,7 @@ app.use(cors())
 
 app.use('/tasks', tasksRouter)
 app.use('/preset-tasks', presetTasksRouter)
+app.use('/auth', authRouter)
 
 
 app.use(function errorHandling(err, req, res, next) {
