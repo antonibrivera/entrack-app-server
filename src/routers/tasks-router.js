@@ -38,15 +38,15 @@ tasksRouter
           task_name: xss(task.task_name),
           duration: task.duration,
           description: xss(task.description),
-          task_date: task.date
+          task_date: task.task_date
         });
       })
       .catch(next)
   })
   .patch(bodyParser, (req, res, next) => {
     const { id } = req.params
-    const { task_name, duration, description } = req.body
-    const taskToUpdate = { task_name, duration, description }
+    const { task_name, duration, description, task_date } = req.body
+    const taskToUpdate = { task_name, duration, description, task_date }
 
     const values = Object.values(taskToUpdate).filter(Boolean).length
     if (values == 0) res.status(400).json({ error: "Request body must contain 'task name', 'duration', or 'description'." })
@@ -55,6 +55,7 @@ tasksRouter
       .then(task => {
         res.json({ message: 'You have successfully updated your task.' })
       })
+      .catch(next)
   })
   .delete((req, res, next) => {
     const { id } = req.params

@@ -3,5 +3,6 @@ CREATE TABLE preset_tasks (
   user_id INTEGER REFERENCES users(id) ON DELETE CASCADE NOT NULL,
   task_name TEXT NOT NULL,
   duration INTERVAL NOT NULL,
-  description TEXT NOT NULL
+  description TEXT NOT NULL,
+  flagged BOOLEAN DEFAULT false NOT NULL
 );

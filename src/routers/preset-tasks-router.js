@@ -36,10 +36,10 @@ presetTasksRouter
         res.json(presetTask)
       })
   })
-  .patch((req, res, next) => {
+  .patch(bodyParser, (req, res, next) => {
     const { id } = req.params
-    const { task_name, duration, description } = req.body
-    const presetTaskToUpdate = { task_name, duration, description }
+    const { user_id, task_name, duration, description } = req.body
+    const presetTaskToUpdate = { user_id, task_name, duration, description }
 
     const values = Object.values(presetTaskToUpdate).filter(Boolean).length
     if (values.length == 0) res.status(404).json({ error: "Request body must contain 'task name', 'duration', 'description'." })
@@ -48,6 +48,15 @@ presetTasksRouter
       .then(() => {
         res.json({ message: 'You have successfully updated your task.' })
       })
+      .catch(next)
+  })
+  .delete((req, res, next) => {
+    const { id } = req.params
+    PresetTasksServices.deletePresetTask(req.app.get('db'), id)
+      .then(() => {
+        res.status(200).json({ message: 'You have successfully deleted your note.' })
+      })
+      .catch(next)
   })
 
 module.exports = presetTasksRouter;

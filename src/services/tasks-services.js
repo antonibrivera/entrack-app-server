@@ -2,6 +2,12 @@ const TasksServices = {
   getAllTasks(db) {
     return db.select('*').from('tasks')
   },
+  getById(db, id) {
+    return db('tasks')
+      .select('*')
+      .where('id', id)
+      .first()
+  },
   insertTask(db, task) {
     return db
       .insert(task)
@@ -9,21 +15,15 @@ const TasksServices = {
       .returning('*')
       .then(rows => rows[0])
   },
-  getById(db, id) {
+  updateTask(db, id, newData) {
     return db('tasks')
-      .select('*')
       .where('id', id)
-      .first()
+      .update(newData)
   },
   deleteTask(db, id) {
     return db('tasks')
       .where('id', id)
       .del()
-  },
-  updateTask(db, id, newData) {
-    return db('tasks')
-      .where('id', id)
-      .update(newData)
   },
 }
 
