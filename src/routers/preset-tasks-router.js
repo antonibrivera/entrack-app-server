@@ -1,22 +1,25 @@
 const express = require('express')
 const xss = require('xss')
 const PresetTasksServices = require('../services/preset-tasks-services')
+const requireAuth = require('../../middlewares/user-auth')
 
 const presetTasksRouter = express.Router()
 const bodyParser = express.json()
 
 presetTasksRouter
   .route('/')
+  .all(requireAuth)
   .get((req, res, next) => {
-    PresetTasksServices.getAllPresetTasks(req.app.get('db'))
+    PresetTasksServices.getAllUserPresetTasks(req.app.get('db'), req.user.id)
       .then(tasks => {
-        if (!tasks) res.status(404).json({ error: 'You have no preset tasks' })
+        if (!tasks || tasks.length == 0) res.status(404).json({ error: 'You have no preset tasks' })
         res.json(tasks)
       })
       .catch(next)
   })
   .post(bodyParser, (req, res, next) => {
-    const { user_id, task_name, duration, description } = req.body
+    const { task_name, duration, description } = req.body
+    const user_id = req.user.id
     const newPresetTask = { user_id, task_name, duration, description }
 
     PresetTasksServices.insertPresetTask(req.app.get('db'), newPresetTask)
@@ -28,9 +31,10 @@ presetTasksRouter
 
 presetTasksRouter
   .route('/:id')
+  .all(requireAuth)
   .get((req, res, next) => {
     const { id } = req.params
-    PresetTasksServices.getById(req.app.get('db'), id)
+    PresetTasksServices.getByIdForUser(req.app.get('db'), id, req.user.id)
       .then(presetTask => {
         if (!presetTask) res.status(404).json({ error: 'That task does not exist. Try again' })
         res.json(presetTask)

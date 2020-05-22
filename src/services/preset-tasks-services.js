@@ -1,11 +1,13 @@
 const PresetTasksServices = {
-  getAllPresetTasks(db) {
-    return db.select('*').from('preset_tasks')
-  },
-  getById(db, id) {
+  getAllUserPresetTasks(db, userId) {
     return db('preset_tasks')
       .select('*')
-      .where('id', id)
+      .where('user_id', userId)
+  },
+  getByIdForUser(db, id, userId) {
+    return db('preset_tasks')
+      .select('*')
+      .where({ id: id, user_id: userId })
       .first()
   },
   insertPresetTask(db, presetTask) {

@@ -1,22 +1,25 @@
 const express = require('express')
 const xss = require('xss')
 const TasksServices = require('../services/tasks-services')
+const requireAuth = require('../../middlewares/user-auth')
 
 const tasksRouter = express.Router()
 const bodyParser = express.json()
 
 tasksRouter
   .route('/')
+  .all(requireAuth)
   .get((req, res, next) => {
-    TasksServices.getAllTasks(req.app.get('db'))
+    TasksServices.getAllUserTasks(req.app.get('db'), req.user.id)
       .then(tasks => {
-        if (!tasks) res.status(404).json({ error: 'There are no tasks.' })
+        if (!tasks || tasks.length == 0) res.status(404).json({ error: 'There are no tasks.' })
         res.json(tasks)
       })
       .catch(next)
   })
   .post(bodyParser, (req, res, next) => {
-    const { user_id, task_name, duration, description, task_date } = req.body
+    const { task_name, duration, description, task_date } = req.body
+    const user_id = req.user.id
     const newTask = { user_id, task_name, duration, description, task_date }
 
     TasksServices.insertTask(req.app.get('db'), newTask)
@@ -28,9 +31,10 @@ tasksRouter
   
 tasksRouter
   .route('/:id')
+  .all(requireAuth)
   .get((req, res, next) => {
     const { id } = req.params
-    TasksServices.getById(req.app.get('db'), id)
+    TasksServices.getByIdForUser(req.app.get('db'), id, req.user.id)
       .then(task => {
         if (!task) res.status(404).json({ error: 'That task does not exists. Try again.' })
         res.json({

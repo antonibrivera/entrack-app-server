@@ -1,11 +1,13 @@
 const TasksServices = {
-  getAllTasks(db) {
-    return db.select('*').from('tasks')
-  },
-  getById(db, id) {
+  getAllUserTasks(db, userId) {
     return db('tasks')
       .select('*')
-      .where('id', id)
+      .where('user_id', userId)
+  },
+  getByIdForUser(db, id, userId) {
+    return db('tasks')
+      .select('*')
+      .where({ id: id, user_id: userId })
       .first()
   },
   insertTask(db, task) {

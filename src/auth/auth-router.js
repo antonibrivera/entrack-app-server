@@ -25,6 +25,7 @@ authRouter
             res.send({ authToken: AuthServices.createJwt(sub, payload) })
           })
       })
+      .catch(next)
   })
 
 module.exports = authRouter;
