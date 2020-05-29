@@ -22,6 +22,9 @@ tasksRouter
     const user_id = req.user.id
     const newTask = { user_id, task_name, duration, description, task_date }
 
+    if (newTask.task_name == null) res.status(400).json({ error: `Missing value for task name. Try again.` })
+    if (newTask.duration == null) res.status(400).json({ error: `Missing value for duration. Try again.` })
+
     TasksServices.insertTask(req.app.get('db'), newTask)
       .then(task => {
         res.status(201).json(task)
@@ -53,7 +56,7 @@ tasksRouter
     const taskToUpdate = { task_name, duration, description, task_date }
 
     const values = Object.values(taskToUpdate).filter(Boolean).length
-    if (values == 0) res.status(400).json({ error: "Request body must contain 'task name', 'duration', or 'description'." })
+    if (values == 0) res.status(400).json({ error: "Request body must contain 'task name', 'duration', 'description', or 'task date'." })
 
     TasksServices.updateTask(req.app.get('db'), id, taskToUpdate)
       .then(task => {
@@ -63,11 +66,15 @@ tasksRouter
   })
   .delete((req, res, next) => {
     const { id } = req.params
-    TasksServices.deleteTask(req.app.get('db'), id)
-      .then(() => {
-        res.status(200).json({ message: 'You have successfully deleted your note.' })
+    TasksServices.getByIdForUser(req.app.get('db'), id, req.user.id)
+      .then(task => {
+        if (!task) res.status(404).json({ error: 'That task does not exists. Try again.' })
+        TasksServices.deleteTask(req.app.get('db'), id)
+          .then(() => {
+            res.status(200).json({ message: 'You have successfully deleted your note.' })
+          })
+          .catch(next)
       })
-      .catch(next)
   })
 
 module.exports = tasksRouter;
