@@ -1,6 +1,7 @@
 const express = require('express')
 const xss = require('xss')
 const AuthServices = require('./auth-services')
+const requireAuth = require('../../middlewares/user-auth')
 
 const authRouter = express.Router()
 const bodyParser = express.json()
@@ -26,6 +27,20 @@ authRouter
           })
       })
       .catch(next)
+  })
+
+authRouter
+  .route('/user')
+  .get(requireAuth, (req, res, next) => {
+    const { id } = req.user
+    AuthServices.getUserById(req.app.get('db'), id)
+      .then(user => {
+        if (!user) return res.status(404).json({ error: 'That user does not exist.' })
+        res.json({
+          first_name: user.first_name,
+          last_name: user.last_name
+        })
+      })
   })
 
 module.exports = authRouter;

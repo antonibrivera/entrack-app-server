@@ -1,6 +1,6 @@
-# Express Boilerplate!
+# EnTrack App
 
-This is a boilerplate project used for starting new projects!
+This app is made to help entrepreneurs keep track of their time, not just thier finances.
 
 ## Set up
 
