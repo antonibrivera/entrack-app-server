@@ -41,6 +41,7 @@ authRouter
           last_name: user.last_name
         })
       })
+      .catch(next)
   })
 
 module.exports = authRouter;
