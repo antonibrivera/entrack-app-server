@@ -6,7 +6,7 @@ Link to Client repo: https://github.com/antonibrivera/entrack-app-client
 
 ## How to Use the API
 
-The API itself runs on the root endpoint as follows: https://secret-cove-63111.herokuapp.com/
+The API itself runs deployed on a heroku serveron the root endpoint as follows: https://secret-cove-63111.herokuapp.com/
 There are 3 main paths to interact with. The '/tasks' and '/preset-tasks' routes are the routes to interact with to get set tasks that are left to complete along with preset tasks to choose from to set as a task. The '/auth' route is made to interact with the user through authentication.
 
 - Making a GET request on the 'tasks' routes will return a list of tasks.
