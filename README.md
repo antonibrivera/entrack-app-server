@@ -1,26 +1,54 @@
-# EnTrack App
+## EnTrack App
 
-This app is made to help entrepreneurs keep track of their time, not just thier finances.
+Link to live site: https://entrack-app.now.sh/
 
-## Set up
+Link to Client repo: https://github.com/antonibrivera/entrack-app-client
 
-Complete the following steps to start a new project (NEW-PROJECT-NAME):
+## How to Use the API
 
-1. Clone this repository to your local machine `git clone BOILERPLATE-URL NEW-PROJECTS-NAME`
-2. `cd` into the cloned repository
-3. Make a fresh start of the git history for this project with `rm -rf .git && git init`
-4. Install the node dependencies `npm install`
-5. Move the example Environment file to `.env` that will be ignored by git and read by the express server `mv example.env .env`
-6. Edit the contents of the `package.json` to use NEW-PROJECT-NAME instead of `"name": "express-boilerplate",`
+The API itself runs deployed on a heroku serveron the root endpoint as follows: https://secret-cove-63111.herokuapp.com/
+There are 3 main paths to interact with. The '/tasks' and '/preset-tasks' routes are the routes to interact with to get set tasks that are left to complete along with preset tasks to choose from to set as a task. The '/auth' route is made to interact with the user through authentication.
 
-## Scripts
+- Making a GET request on the 'tasks' routes will return a list of tasks.
 
-Start the application `npm start`
+- Making a GET request to a '/(tasks)/:id' route will return an individual task.
 
-Start nodemon for the application `npm run dev`
+- A POST request on the 'tasks' routes will add a new task to the database.
 
-Run the tests `npm test`
+- Making a PATCH request to a '/(task)/:id' route will update the task with the given ID.
 
-## Deploying
+- Finally, a DELETE request to a '/(task)/:id' route will delete the given task.
 
-When your new project is ready for deployment, add a new Heroku application with `heroku create`. This will make a new git remote called "heroku" and you can then `npm run deploy` which will push to this remote's master branch.
+
+- A POST request to '/auth/login' will return a JSON Web Token to be stored in the user's browser for authentication.
+
+- A GET request to '/auth/user' will return the current user's first and last name to be used in the greeting on the dashboard.
+
+All of the '/tasks' and '/preset-tasks' routes are protected endpoints, so a user must be logged in to their own account to access any information from the database.
+
+## Screenshots
+
+![EnTrack_App5](https://user-images.githubusercontent.com/26678591/83586650-04b6a480-a51b-11ea-80fb-090167b4dc77.png)
+
+![EnTrack_App3](https://user-images.githubusercontent.com/26678591/83586664-113afd00-a51b-11ea-9428-90a97d0f9056.png)
+
+![EnTrack_App1](https://user-images.githubusercontent.com/26678591/83586568-d5079c80-a51a-11ea-8193-7051473b68da.png)
+
+![EnTrack_App2](https://user-images.githubusercontent.com/26678591/83586589-e2bd2200-a51a-11ea-9edb-dbee3fa4380a.png)
+
+![EnTrack_App4](https://user-images.githubusercontent.com/26678591/83586684-1f891900-a51b-11ea-963c-7efb91a037e6.png)
+
+
+## Summary
+
+EnTrack was made to help business owners and entrepreneurs keep track of the time they have to work. Part of owning your own business is making your own schedule, but it's not always easy to know exactly how many hours of work you need to put in. With EnTrack, you can create tasks and give them a total amount of time it takes to complete it. You can also create new or select from a list of preset tasks you know you always have to get done. Instead of typing in the same task every time, you can pick a task and it's date to get done. Each day you'll get a summary of the total hours to work for that day and you can filter your list of tasks to today's tasks or all your tasks.
+
+## Technologies Used
+
+- HTML/JSX
+- CSS
+- JavaScript
+- React.js
+- Node.js
+- Express.js
+- PostgreSQL
