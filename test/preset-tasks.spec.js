@@ -38,7 +38,7 @@ describe('Preset Tasks Router', () => {
         .expect(404, { error: 'You have no preset tasks' });
     })
     it('responds with list of tasks if avaiable', () => {
-      before('seed tasks table', helpers.seedPresetTasksTable(db, helpers.makeTasksArray()))
+      before('seed tasks table', helpers.seedPresetTasksTable(db, helpers.makePresetTasksArray()))
       return supertest(app)
         .get('/preset-tasks')
         .set('Authorization', helpers.makeAuthHeader(testUser))
@@ -46,65 +46,60 @@ describe('Preset Tasks Router', () => {
     }) 
   })
 
-  describe('POST /tasks', () => {
+  describe('POST /preset-tasks', () => {
     it('responds with 400 if field missing', () => {
       const noNameTestTask = {
         user_id: 1,
         duration: '2:30',
         description: 'This is a test description',
-        task_date: date.toISOString(),
-        flagged: false
       }
 
       return supertest(app)
-        .post('/tasks')
+        .post('/preset-tasks')
         .set('Authorization', helpers.makeAuthHeader(testUser))
         .send(noNameTestTask)
         .expect(400)
     })
     it('successfully posts to database', () => {
       const testTask = {
-        user_id: 1,
         task_name: 'TEST POST TASK',
         duration: '2:30',
         description: 'This is a test description',
-        task_date: date.toISOString(),
-        flagged: false
       }
 
       return supertest(app)
-        .post('/tasks')
+        .post('/preset-tasks')
         .set('Authorization', helpers.makeAuthHeader(testUser))
         .send(testTask)
         .expect(200)
     })
   })
 
-  describe('GET /tasks/:id', () => {
+  describe('GET /preset-tasks/:id', () => {
     it('responds with 404 if no tasks', () => {
       return supertest(app)
-        .get('/tasks/1')
+        .get('/preset-tasks/1')
         .set('Authorization', helpers.makeAuthHeader(testUser))
         .expect(404)
     })
     it('responds with the task if exists', () => {
-      before('seed tasks table', seedTasksTable(db, helpers.makeTasksArray()))
+      before('seed tasks table', seedTasksTable(db, helpers.makePresetTasksArray()))
       return supertest(app)
-        .get('/tasks/1')
+        .get('/preset-tasks/1')
         .set('Authorization', helpers.makeAuthHeader(testUser))
         .expect(200)
     })
   })
 
-  describe('PATCH /tasks/:id', () => {
+  describe('PATCH /preset-tasks/:id', () => {
     it('responds with 400 if no field is passed in', () => {
       return supertest(app)
-        .patch('/tasks/1')
+        .patch('/preset-tasks/1')
         .set('Authorization', helpers.makeAuthHeader(testUser))
         .send({})
         .expect(400)
     })
-    it('successfully updates the task', () => {
+    it('successfully updates the preset task', () => {
       const taskToUpdate = {
         task_name: 'TEST UPDATE',
         duration: '1:45',
@@ -113,24 +108,24 @@ describe('Preset Tasks Router', () => {
       }
 
       return supertest(app)
-        .patch('/tasks/1')
+        .patch('/preset-tasks/1')
         .set('Authorization', helpers.makeAuthHeader(testUser))
         .send(taskToUpdate)
         .expect(200)
     })
   })
 
-  describe('DELETE /tasks/:id', () => {
-    it('responds with 404 if task doesn\'t exist', () => {
+  describe('DELETE /preset-tasks/:id', () => {
+      before('seed tasks table', seedTasksTable(db, helpers.makePresetTasksArray()))
+      it('responds with 404 if task doesn\'t exist', () => {
       return supertest(app)
-        .delete('/tasks/10000')
+        .delete('/preset-tasks/10000')
         .set('Authorization', helpers.makeAuthHeader(testUser))
         .expect(404, { error: 'That task does not exist. Try again.' })
     })
     it('successfully deletes the message', () => {
-      before('seed tasks table', seedTasksTable(db, helpers.makeTasksArray()))
       return supertest(app)
-        .delete('/tasks/1')
+        .delete('/preset-tasks/1')
         .set('Authorization', helpers.makeAuthHeader(testUser))
         .expect(404, { error: 'That task does not exist. Try again.' })
     })
