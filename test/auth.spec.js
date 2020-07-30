@@ -3,8 +3,9 @@ require('dotenv').config();
 const app = require('../src/app');
 const jwt = require('jsonwebtoken');
 const helpers = require('./test-helpers');
+const supertest = require('supertest');
 
-describe('Auth Endpoints', () => {
+describe.only('Auth Endpoints', () => {
   let db;
 
   const testUsers = helpers.makeUsersArray();
@@ -13,7 +14,7 @@ describe('Auth Endpoints', () => {
   before('make knex instance', () => {
     db = knex({
       client: 'pg',
-      connection: process.env.TEST_DATABASE_URL,
+      connection: process.env.TEST_DATABASE_URL
     });
     app.set('db', db);
   });
@@ -22,9 +23,11 @@ describe('Auth Endpoints', () => {
 
   before('cleanup', () => helpers.cleanTables(db));
 
+  before(() => helpers.seedUsers(db))
+
   afterEach('cleanup', () => helpers.cleanTables(db));
 
-  describe('POST /api/auth/login', () => {
+  describe('POST /auth/login', () => {
     beforeEach('insert users', () =>
       helpers.seedUsers(
         db,
@@ -45,25 +48,25 @@ describe('Auth Endpoints', () => {
         delete loginAttemptBody[field];
 
         return supertest(app)
-          .post('/api/auth/login')
+          .post('/auth/login')
           .send(loginAttemptBody)
-          .expect(400, { error: `Missing '${field}' in request body` });
+          .expect(400, { error: `Missing value for ${field} in request body` });
       });
     });
     it('responds 400 invalid username or password when invalid username', () => {
       const userInvalidUser = { username: 'invalid', password: 'exists' };
 
       return supertest(app)
-        .post('/api/auth/login')
+        .post('/auth/login')
         .send(userInvalidUser)
-        .expect(400, { error: 'Incorrect username or password' });
+        .expect(400, { error: 'Incorrect username or password. Try again.' });
     });
     it('responds 400 invalid username or password when invalid password', () => {
       const userInvalidPassword = { username: testUser.username, password: 'invalid' };
       return supertest(app)
-        .post('/api/auth/login')
+        .post('/auth/login')
         .send(userInvalidPassword)
-        .expect(400, { error: 'Incorrect username or password' });
+        .expect(400, { error: 'Incorrect username or password. Try again.' });
     });
     it('responds 200 and JWT auth when valid credentials', () => {
 
@@ -73,10 +76,7 @@ describe('Auth Endpoints', () => {
       };
 
       const expectedToken = jwt.sign(
-        {
-          user_id: testUser.id,
-          admin: testUser.admin
-        },
+        { user_id: testUser.id },
         process.env.JWT_SECRET,
         {
           subject: testUser.username,
@@ -84,9 +84,22 @@ describe('Auth Endpoints', () => {
         },
       );
 
-      return supertest(app).post('/api/auth/login').send(validCreds).expect(200, {
-        authToken: expectedToken,
-      });
+      return supertest(app)
+        .post('/auth/login')
+        .send(validCreds)
+        .expect(200, { authToken: expectedToken });
     });
   });
+
+  describe('GET /user', () => {
+    it('should respond with the logged-in user\'s first & last name', () => {
+      return supertest(app)
+        .get('/auth/user')
+        .set('Authorization', helpers.makeAuthHeader(testUser))
+        .expect(200, {
+          first_name: testUser.first_name,
+          last_name: testUser.last_name
+        })
+    })
+  })
 });

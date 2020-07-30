@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const date = new Date()
+const AuthServices = require('../src/auth/auth-services')
 
 function makeUsersArray() {
   return [
@@ -9,7 +10,7 @@ function makeUsersArray() {
       first_name: 'John',
       last_name: 'Smith',
       username: 'test-user-1',
-      password: '$2a$12$zWLdBYUUkhxEwp9otJabJee1kssOOZn9go0rsZQOM.N7ycghvLPz6',
+      password: '@passWord1',
       email:'johnsmith@test.com',
       date_created: date.toISOString(),
     },
@@ -18,7 +19,7 @@ function makeUsersArray() {
       first_name: 'Michael',
       last_name: 'Smith',
       username: 'test-user-2',
-      password: '$2a$12$zWLdBYUUkhxEwp9otJabJee1kssOOZn9go0rsZQOM.N7ycghvLPz6',
+      password: '@passWord1',
       email:'johnsmith@test.com',
       date_created: date.toISOString(),
     },
@@ -27,7 +28,7 @@ function makeUsersArray() {
       first_name: 'Bob',
       last_name: 'Smith',
       username: 'test-user-3',
-      password: '$2a$12$zWLdBYUUkhxEwp9otJabJee1kssOOZn9go0rsZQOM.N7ycghvLPz6',
+      password: '@passWord1',
       email:'johnsmith@test.com',
       date_created: date.toISOString(),
     },
@@ -152,8 +153,8 @@ function seedUsers(db, users) {
   const hashedUsers = users.map(user => ({
     ...user,
     password: bcrypt.hashSync(user.password, 1)
-  }));
-  return db.into('users').insert(hashedUsers)
+  }))
+  return db.insert(hashedUsers).into('users')
     .then(() =>
       db.raw(
         `SELECT setval('users_id_seq', ?)`,
@@ -170,10 +171,15 @@ function makeAuthHeader(user, secret = process.env.JWT_SECRET) {
     subject: user.username,
     algorithm: 'HS256',
   });
-  return `Bearer ${token}`;
+  let sub = user.username
+  let payload = { user_id: user.id }
+  return `Bearer ${token}`; 
+  return AuthServices.createJwt(sub, payload)
 };
 
-function seedTasksTable(db, users, tasks = []) {
+function seedTasksTable(db, tasks = [], users = makeUsersArray()) {
+  return db.into('tasks').insert(tasks)
+
   return db.transaction(async trx => {
     await seedUsers(trx, users)
     await trx.into('tasks').insert(tasks)
@@ -189,7 +195,7 @@ function seedPresetTasksTable(db, users, preset_tasks = []) {
     await seedUsers(trx, users)
     await trx.into('preset_tasks').insert(preset_tasks)
     await trx.raw(
-      `SELECT setval('tasks_id_seq', ?)`,
+      `SELECT setval('preset_tasks_id_seq', ?)`,
       [preset_tasks[preset_tasks.length - 1].id],
     )
   })
@@ -199,6 +205,7 @@ module.exports = {
   makeAuthHeader,
   makeUsersArray,
   makeTasksArray,
+  makePresetTasksArray,
   makeExpectedTask,
   makeMessagesFixtures,
   cleanTables,
